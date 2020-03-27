@@ -3,18 +3,12 @@ provider "aws" {
 }
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-
-  name = "panorama-test"
-  cidr = "192.168.254.0/24"
-
-  azs             = ["eu-north-1a"]
-  public_subnets  = ["192.168.254.0/28"]
-
-  tags = {
-    Terraform = "true"
-    Environment = "test"
+  source     = "git::https://gitlab.com/public-tf-modules/terraform-aws-vpc?ref=v0.1.0"
+  cidr_block = "10.0.0.0/16"
+  subnets = {
+    public-1a  = { cidr = "10.0.0.0/24", az = "eu-north-1a", route_table = "public" },
   }
+  public_rts = ["public"]
 }
 
 module "panorama" {
@@ -23,7 +17,7 @@ module "panorama" {
     panorama1 = {
       instance_type = "t3.xlarge",
       public_ip =  true
-      subnet_id = module.vpc.public_subnets[0]
+      subnet_id = module.vpc.subnets["public-1a"].id
     }
   }
   fw_key_name = var.fw_key_name

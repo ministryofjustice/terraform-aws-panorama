@@ -14,19 +14,19 @@ data "aws_ami" "this" {
   }
 }
 
-
 locals {
-  logger_panoramas = { for name, panorama in var.panoramas : name => panorama if contains(keys(panorama), "ebs")}
+  logger_panoramas = { for name, panorama in var.panoramas : name => panorama if contains(keys(panorama), "ebs") }
+  eip_panoramas    = { for name, panorama in var.panoramas : name => panorama if lookup(panorama, "public_ip", null) == true ? true : false }
 }
 
 #### Create the Panorama Instances ####
 resource "aws_instance" "this" {
-  for_each = var.panoramas
+  for_each                             = var.panoramas
   disable_api_termination              = false
   instance_initiated_shutdown_behavior = "stop"
   ebs_optimized                        = true
   ami                                  = data.aws_ami.this.id
-  instance_type                        = each.value.instance_type
+  instance_type                        = lookup(each.value, "instance_type", "m4.2xlarge")
   tags = merge(
     {
       "Name" = each.key
@@ -42,18 +42,18 @@ resource "aws_instance" "this" {
   monitoring = false
 
   private_ip = lookup(each.value, "private_ip", null)
-  associate_public_ip_address = lookup(each.value, "public_ip", null)
-  
+  # associate_public_ip_address = lookup(each.value, "public_ip", null)
+
   vpc_security_group_ids = var.security_groups
-  subnet_id = each.value.subnet_id
+  subnet_id              = each.value.subnet_id
 }
 
 resource "aws_ebs_volume" "this" {
   for_each          = local.logger_panoramas
   availability_zone = each.value.ebs.availability_zone
-  encrypted         = lookup(each.value.ebs, "encrypted", null)
+  encrypted         = lookup(each.value.ebs, "encrypted", true)
   iops              = lookup(each.value.ebs, "iops", null)
-  size              = lookup(each.value.ebs, "size", null)
+  size              = lookup(each.value.ebs, "size", 2000)
   snapshot_id       = lookup(each.value.ebs, "snapshot_id", null)
   type              = lookup(each.value.ebs, "type", null)
   kms_key_id        = lookup(each.value.ebs, "kms_key_id", null)
@@ -67,9 +67,19 @@ resource "aws_ebs_volume" "this" {
 
 resource "aws_volume_attachment" "this" {
   for_each     = local.logger_panoramas
-  device_name  = each.value.ebs.device_name
+  device_name  = lookup(each.value.ebs, "device_name", "/dev/sdf")
   instance_id  = aws_instance.this[each.key].id
   volume_id    = aws_ebs_volume.this[each.key].id
   force_detach = lookup(each.value, "force_detach", null)
   skip_destroy = lookup(each.value, "skip_destroy", null)
+}
+
+#### Create the Panorama elastic IPs ####
+resource "aws_eip" "eip-management" {
+  for_each         = local.eip_panoramas
+  vpc              = true
+  instance         = aws_instance.this[each.key].id
+  public_ipv4_pool = var.public_ipv4_pool
+
+  tags = merge(map("Name", format("%s-${lookup(local.device_map, count.index + 1)}-eip", var.panorama_hostname_prefix)), var.tags)
 }

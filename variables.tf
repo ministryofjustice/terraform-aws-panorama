@@ -41,5 +41,10 @@ variable "fw_key_name" {
 
 variable "security_groups" {
   description = "list of security groups"
-  default = null
+  default     = null
+}
+
+variable "public_ipv4_pool" {
+  description = "EC2 IPv4 address pool identifier"
+  default     = "amazon"
 }

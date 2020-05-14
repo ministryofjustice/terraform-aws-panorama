@@ -81,5 +81,5 @@ resource "aws_eip" "eip-management" {
   instance         = aws_instance.this[each.key].id
   public_ipv4_pool = var.public_ipv4_pool
 
-  tags = merge(map("Name", format("%s-${lookup(local.device_map, count.index + 1)}-eip", var.panorama_hostname_prefix)), var.tags)
+  tags = merge({ "Name" = "${each.key}-eip" }, var.tags)
 }

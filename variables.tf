@@ -34,8 +34,8 @@ variable "tags" {
   default     = {}
 }
 
-variable "fw_key_name" {
-  description = "SSH Public Key to use w/firewall"
+variable "panorama_key_name" {
+  description = "SSH Public Key to use w/panorama"
   default     = ""
 }
 

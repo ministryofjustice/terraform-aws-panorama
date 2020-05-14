@@ -38,7 +38,7 @@ resource "aws_instance" "this" {
     delete_on_termination = true
   }
 
-  key_name   = var.fw_key_name
+  key_name   = var.panorama_key_name
   monitoring = false
 
   private_ip = lookup(each.value, "private_ip", null)

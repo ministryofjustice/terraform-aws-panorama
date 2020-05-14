@@ -75,7 +75,7 @@ resource "aws_volume_attachment" "this" {
 }
 
 #### Create the Panorama elastic IPs ####
-resource "aws_eip" "eip-management" {
+resource "aws_eip" "this" {
   for_each         = local.eip_panoramas
   vpc              = true
   instance         = aws_instance.this[each.key].id

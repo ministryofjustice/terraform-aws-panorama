@@ -82,4 +82,6 @@ resource "aws_eip" "this" {
   public_ipv4_pool = var.public_ipv4_pool
 
   tags = merge({ "Name" = "${each.key}-eip" }, var.tags)
+
+  depends_on = [aws_instance.this]
 }

@@ -15,13 +15,15 @@ data "aws_ami" "this" {
 }
 
 locals {
-  logger_panoramas = { for name, panorama in var.panoramas : name => panorama if contains(keys(panorama), "ebs") }
-  eip_panoramas    = { for name, panorama in var.panoramas : name => panorama if panorama.public_ip }
+  # logger_panoramas = { for name, panorama in var.panoramas : name => panorama if contains(keys(panorama), "ebs") }
+  # eip_panoramas    = { for name, panorama in var.panoramas : name => panorama if panorama.public_ip }
+  logger_panoramas = { for panorama in var.panoramas : panorama.name => panorama if contains(keys(panorama), "ebs") }
+  eip_panoramas    = { for panorama in var.panoramas : panorama.name => panorama if panorama.public_ip }
 }
 
 #### Create the Panorama Instances ####
 resource "aws_instance" "this" {
-  for_each                             = var.panoramas
+  for_each                             = { for panorama in var.panoramas : panorama.name => panorama }
   disable_api_termination              = false
   instance_initiated_shutdown_behavior = "stop"
   ebs_optimized                        = true

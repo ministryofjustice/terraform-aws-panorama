@@ -5,7 +5,7 @@ data "aws_ami" "this" {
 
   filter {
     name   = "product-code"
-    values = ["${var.pano_license_type_map[var.pano_license_type]}"]
+    values = [var.pano_license_type_map[var.pano_license_type]]
   }
 
   filter {

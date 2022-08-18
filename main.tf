@@ -48,6 +48,12 @@ resource "aws_instance" "this" {
 
   vpc_security_group_ids = var.security_groups
   subnet_id              = each.value.subnet_id
+  
+  lifecycle {
+    ignore_changes = [
+      ami,
+    ]
+  }
 }
 
 resource "aws_ebs_volume" "this" {

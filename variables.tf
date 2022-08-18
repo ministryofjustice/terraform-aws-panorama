@@ -2,7 +2,7 @@
 
 variable "pano_version" {
   description = "Select which Panorama version to deploy"
-  default     = "9.1.8"
+  default     = "9.1.8*"
 }
 
 # License type for AMI lookup

@@ -5,12 +5,12 @@ data "aws_ami" "this" {
 
   filter {
     name   = "product-code"
-    values = [var.product_code]
+    values = [var.pano_license_type_map[var.pano_license_type]]
   }
 
   filter {
     name   = "name"
-    values = ["Panorama-AWS-${var.panorama_version}*"]
+    values = ["Panorama-AWS-${var.pano_version}*"]
   }
 }
 

@@ -51,7 +51,7 @@ resource "aws_instance" "this" {
   
   lifecycle {
     ignore_changes = [
-      ami,
+      ami, ebs_optimized, aws_ebs_volume,
     ]
   }
 }

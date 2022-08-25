@@ -17,7 +17,7 @@ data "aws_ami" "this" {
 locals {
   # logger_panoramas = { for name, panorama in var.panoramas : name => panorama if contains(keys(panorama), "ebs") }
   # eip_panoramas    = { for name, panorama in var.panoramas : name => panorama if panorama.public_ip }
-  logger_panoramas = { for panorama in var.panoramas : panorama.name => panorama if contains(keys(panorama), "ebs") }
+  logger_panoramas = { for panorama in var.panoramas : panorama.name => panorama if contains(keys(panorama), "ebs") && panorama.ebs != null }
   eip_panoramas    = { for panorama in var.panoramas : panorama.name => panorama if panorama.public_ip }
 }
 

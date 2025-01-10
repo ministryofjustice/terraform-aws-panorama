@@ -51,7 +51,7 @@ resource "aws_instance" "this" {
   
   lifecycle {
     ignore_changes = [
-      ami, ebs_block_device, aws_eip, key_name
+      ami, ebs_block_device, key_name
     ]
   }
 }
